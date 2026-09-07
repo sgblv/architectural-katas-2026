@@ -6,7 +6,7 @@ Proposed
 
 ## Context
 
-The Von Digitalis estate is large, sprawling, and has patchy wifi coverage (C1). There is budget for MQTT-capable hardware devices installed throughout the park (C3), cloud services are permitted, but the path from the estate to the cloud has to be designed rather than assumed (C2).
+The Von Digitalis estate is large, sprawling, and has patchy wifi coverage ([C1](https://github.com/Humanberto/architectural-katas-2026/blob/adr/040-connectivity/docs/requirements.md#:~:text=C1,park%20is%20patchy)). There is budget for MQTT-capable hardware devices installed throughout the park (C3), cloud services are permitted, but the path from the estate to the cloud has to be designed rather than assumed (C2).
 
 The estate must monitor 200+ animals across 55 enclosures (C5), a mix of aquatic and land-based species, several of them venomous, where physical access is restricted and hazardous (C6, C10). It must also measure how visitors move through 40 rides and the grounds (C4) to answer the Countess's question about which parts of the estate are popular (P2).
 
