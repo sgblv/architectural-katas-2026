@@ -6,9 +6,9 @@ Proposed
 
 ## Context
 
-The Von Digitalis estate is large, sprawling, and has patchy wifi coverage ([C1](https://github.com/Humanberto/architectural-katas-2026/blob/adr/040-connectivity/docs/requirements.md#:~:text=C1,park%20is%20patchy)). There is budget for MQTT-capable hardware devices installed throughout the park (C3), cloud services are permitted, but the path from the estate to the cloud has to be designed rather than assumed (C2).
+The Von Digitalis estate is large, sprawling, and has patchy wifi coverage ([C1](https://github.com/Humanberto/architectural-katas-2026/blob/adr/040-connectivity/docs/requirements.md#:~:text=C1,park%20is%20patchy)). There is budget for MQTT-capable hardware devices installed throughout the park ([C3](https://github.com/Humanberto/architectural-katas-2026/blob/adr/040-connectivity/docs/requirements.md#:~:text=C3,park%20is%20funded)), cloud services are permitted, but the path from the estate to the cloud has to be designed rather than assumed ([C2](https://github.com/Humanberto/architectural-katas-2026/blob/adr/040-connectivity/docs/requirements.md#:~:text=C2,designed%2C%20not%20assumed)).
 
-The estate must monitor 200+ animals across 55 enclosures (C5), a mix of aquatic and land-based species, several of them venomous, where physical access is restricted and hazardous (C6, C10). It must also measure how visitors move through 40 rides and the grounds (C4) to answer the Countess's question about which parts of the estate are popular (P2).
+The estate must monitor 200+ animals across 55 enclosures ([C5](https://github.com/Humanberto/architectural-katas-2026/blob/adr/040-connectivity/docs/requirements.md#:~:text=C5,displays%20and%20enclosures)), a mix of aquatic and land-based species, several of them venomous, where physical access is restricted and hazardous ([C6](https://github.com/Humanberto/architectural-katas-2026/blob/adr/040-connectivity/docs/requirements.md#:~:text=C6,animals%3B%20some%20poisonous), [C10](https://github.com/Humanberto/architectural-katas-2026/blob/adr/040-connectivity/docs/requirements.md#:~:text=C10,restricted%20and%20hazardous)). It must also measure how visitors move through 40 rides and the grounds ([C4](https://github.com/Humanberto/architectural-katas-2026/blob/adr/040-connectivity/docs/requirements.md#:~:text=C4,40%20rides)) to answer the Countess's question about which parts of the estate are popular ([P2](https://github.com/Humanberto/architectural-katas-2026/blob/adr/040-connectivity/docs/requirements.md#:~:text=P2,deployment%20are%20guesswork)).
 
 Day-to-day technology is run by a single internal IT staff member, with an outsourced team billed hourly for emergencies. Any topology we choose has to be operable by one person on a normal day.
 
@@ -53,7 +53,7 @@ Out of scope for this ADR: whether and how AI-derived instructions may travel ba
 
 - **The estate keeps working when the uplink does not.** Safety-critical monitoring, alarms, and access control have no cloud dependency.
 - **No readings are lost to a wifi outage.** Buffering at Tier 1 and Tier 2 turns lost data into delayed data.
-- **Sensors are cheap and dumb.** Range requirements are satisfied by satellite placement rather than by expensive long-range devices, which keeps us inside the funded hardware budget (C3).
+- **Sensors are cheap and dumb.** Range requirements are satisfied by satellite placement rather than by expensive long-range devices, which keeps us inside the funded hardware budget ([C3](https://github.com/Humanberto/architectural-katas-2026/blob/adr/040-connectivity/docs/requirements.md#:~:text=C3,park%20is%20funded)).
 - **Prioritisation makes a weak uplink usable.** When bandwidth is scarce it is spent on what matters, instead of first-in-first-out.
 - **Adding an enclosure is a local change.** A new sensor joins its nearest satellite; nothing upstream is reconfigured.
 
