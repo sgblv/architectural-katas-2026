@@ -1,4 +1,4 @@
-# 042. Telemetry model, topic taxonomy and delivery guarantees
+# 042. Telemetry model, topic taxonomy, and delivery guarantees
 
 ## Status
 
@@ -6,15 +6,15 @@ Proposed
 
 ## Context
 
-ADR-040 established a tiered MQTT topology. This record defines what travels across it. Which measurements are taken, how topics are named, and what delivery guarantee each stream receives.
+ADR-040 established a tiered MQTT topology. This record defines what travels across it. It specifies which measurements are taken, how topics are named, and what delivery guarantee each stream receives.
 
-The estate holds more than 200 animals across 55 displays and enclosures (C5). They are split between aquatic and land-based species, several of them venomous, in enclosures where physical access is restricted and hazardous (C6, C10). Keepers cannot inspect every enclosure continuously, and the estate runs on a small operations staff (C13). Wifi coverage is patchy (C1) and only MQTT-capable hardware is funded as a baseline (C3, C14).
+The estate holds more than 200 animals across 55 displays and enclosures ([C5](https://github.com/Humanberto/architectural-katas-2026/blob/adr/040-connectivity/docs/requirements.md#:~:text=C5,displays%20and%20enclosures)). They are split between aquatic and land-based species, several of them venomous, in enclosures where physical access is restricted and hazardous ([C6](https://github.com/Humanberto/architectural-katas-2026/blob/adr/040-connectivity/docs/requirements.md#:~:text=C6,animals%3B%20some%20poisonous), [C10](https://github.com/Humanberto/architectural-katas-2026/blob/adr/040-connectivity/docs/requirements.md#:~:text=C10,restricted%20and%20hazardous)). Keepers cannot inspect every enclosure continuously, and the estate runs on a small operations staff ([C13](https://github.com/Humanberto/architectural-katas-2026/blob/adr/040-connectivity/docs/requirements.md#:~:text=C13,house%20ML%20team)). Wifi coverage is patchy ([C1](https://github.com/Humanberto/architectural-katas-2026/blob/adr/040-connectivity/docs/requirements.md#:~:text=C1,park%20is%20patchy)) and only MQTT-capable hardware is funded as a baseline ([C3](https://github.com/Humanberto/architectural-katas-2026/blob/adr/040-connectivity/docs/requirements.md#:~:text=C3,park%20is%20funded), [C14](https://github.com/Humanberto/architectural-katas-2026/blob/adr/040-connectivity/docs/requirements.md#:~:text=C14,be%20argued%20for)).
 
-Two questions force a decision now rather than at implementation time.
+We have two questions that need a decision now rather than at implementation time.
 
-The first is naming. Fifty-five enclosures, forty rides and the gates together produce a large topic space with several different consumers. Without an agreed shape, every consumer writes its own parsing and adding a single enclosure becomes a change that ripples outward.
+The first is naming. Fifty-five enclosures, forty rides, and the gates together produce a large topic space with several different consumers. Without an agreed shape, every consumer writes its own parsing, and adding a single enclosure becomes a change that ripples outward.
 
-The second is delivery. MQTT offers three quality-of-service levels at different cost. Using the strongest one everywhere spends constrained uplink bandwidth on data that does not need it. Using the weakest one everywhere loses information that can never be recovered.
+The second is delivery. MQTT offers three quality-of-service levels at different costs. Using the strongest one everywhere spends constrained uplink bandwidth on data that does not need it. Using the weakest one everywhere loses information that can never be recovered.
 
 ## Decision
 
@@ -88,7 +88,7 @@ Dissolved oxygen is sampled as often as temperature because an oxygen crash kill
 | Feed dispensed | `feed-dispensed` | on event |
 | Feed remaining after interval | `feed-remaining` | on event |
 
-Every venomous enclosure reports containment state. An escape is the most serious event that can happen on this estate and the sensor costs very little against that.
+Every venomous enclosure reports containment state. An escape is the most serious event that can happen on this estate, and the sensor costs very little compared to that.
 
 Lamp state earns its place because heat and UV lamp failure is common, invisible without instrumentation, and harms reptiles within hours.
 
@@ -135,7 +135,7 @@ One naming convention serves every consumer. Visitor footfall arrives on the sam
 
 Wildcards scale past 55 enclosures without anyone enumerating them, so growth in the collection is an operational change rather than a software one.
 
-Bandwidth is spent where loss cannot be undone. On a patchy uplink the guaranteed traffic is a small fraction of the total volume, which leaves headroom for it.
+Bandwidth is spent where loss cannot be undone. On a patchy uplink, the guaranteed traffic is a small fraction of the total volume, which leaves headroom for it.
 
 Dead sensors become detectable. Retained status combined with the last will separates "nothing to report" from "nothing is reporting".
 
