@@ -1,86 +1,113 @@
-# 043. Animal welfare monitoring and the limits of automated action
+# 043. Watching animal health, and what the system may do on its own
 
 ## Status
 
 Proposed
 
-## Decision
+## The decision
 
-Deterministic thresholds set by a veterinarian may act on hardware. Model output may only advise a human.
+Fixed rules written by a vet can switch equipment on by themselves. Anything the AI works out on its own can only be a suggestion to a person.
 
-## Context
+## Why we need to decide this
 
-Animal care is costly and gets costlier when an animal falls ill (P3). Feeding is unmeasured (P9) and the piranhas are uncounted (P6). ADR-042 defines the telemetry arriving from the enclosures. This record covers what the system may do with it, given that model behaviour is not deterministic (C12) and nobody on the estate could diagnose one misbehaving (C13).
+Looking after the animals is expensive, and it gets much more expensive when one falls ill (P3). Today nobody records whether an animal has eaten (P9), and nobody knows how many piranhas there are (P6).
 
-## Thresholds come from a vet
+ADR-042 covers the readings coming out of the enclosures. This record covers what we are allowed to do with those readings.
 
-Safe ranges, alert thresholds and per-species response procedures are supplied by a veterinarian and held as versioned configuration. The system never defines what unhealthy means, and it can always report which version was in force when an alert fired.
+AI does not behave the same way every time (C12). If it starts making bad calls at three in the morning, there is nobody at the estate who could work out why (C13). So we have to be clear about what it is allowed to touch.
 
-## Three classes of event
+## The vet decides what "unwell" means
 
-| Class | Example | Automatic action | Who is told, how fast |
+A vet gives us the safe range for each species, the point at which we should worry, and what to do about it. We save those settings and keep the old versions, so we can always say which settings were in use when an alert went out.
+
+The system never invents its own idea of a sick animal.
+
+## Three kinds of problem
+
+| Kind of problem | Example | Does anything happen automatically? | Who hears about it, and when |
 |---|---|---|---|
-| **1. Risk to people** | Containment door opens on a venomous enclosure | None, alarm only | Security and duty keeper, immediately, on the estate |
-| **2. Fast risk to an animal** | Dissolved oxygen falls below the vet's floor | Standing remediation fires, such as a backup aerator | Duty keeper, immediately, then updates until it recovers |
-| **3. Slow welfare signal** | An animal has not fed for three days | None | Queued for keeper review, same day |
+| **People in danger** | A door opens on a venomous enclosure | No. It only raises the alarm | Security and the keeper on duty, straight away, using equipment on the estate |
+| **Animal in danger now** | Oxygen in the lagoon drops below the vet's limit | Yes. The backup pump comes on | The keeper on duty, straight away, then updates until the reading recovers |
+| **Animal may be unwell** | A fish has not fed for three days | No | Added to the keeper's list to check that day |
 
-Class 1 has no model in its path, because a door sensor reporting open is a fact. Class 3 is advisory because the situation moves over days, and that time is better spent on a keeper looking than a machine acting. Class 1 and 2 alerts require explicit acknowledgement and escalate on a timer, since an unacknowledged alert is one nobody has seen.
+A door is either open or closed. There is nothing to interpret, so no AI is involved in that first row at all.
 
-## The authority boundary
+The third row develops over days. There is time for a person to walk over and look, so the system only suggests.
 
-|  | May act on hardware | May raise, rank and explain |
+For the first two rows, someone has to confirm they have seen the alert. If nobody confirms within a set time, it goes to the next person on the list. An alert nobody has confirmed is an alert we assume nobody has seen.
+
+## What the system may do without asking
+
+|  | Can switch equipment on | Can raise an alert and explain it |
 |---|---|---|
-| Threshold defined by the vet | Yes | Yes |
-| Anything a model infers | **No** | Yes |
+| A fixed limit set by the vet | Yes | Yes |
+| Anything the AI works out | **No** | Yes |
 
-This holds even where a model is more accurate than the threshold beside it. A threshold can be audited and explained to a vet after an incident, whereas a model behaving strangely at three in the morning needs an expert the estate does not employ. Models exist to notice trouble earlier and describe patterns a person would take longer to see, always as a recommendation.
+We keep this rule even when the AI is better at spotting problems than the fixed limit is.
 
-## The alerting unit differs by enclosure
+The reason is simple. If a pump comes on because oxygen dropped below a number the vet wrote down, we can explain that to anyone, afterwards, exactly. If it comes on because a model decided something, we would need someone who understands the model to explain it, and the estate does not employ that person.
 
-Terrestrial alerts concern one animal that a keeper can go and inspect. Lagoon alerts concern the population, because separating one fish from a school is not realistic, so the alert says feeding response is abnormal and asks for observation at the next feed. Individual tracking still detects the pattern sooner, which earns its place as evidence rather than instruction. Piranha work is scoped to counting and tracking groups, and identifying individual fish across weeks is a later refinement that nothing here depends on.
+So the AI's job is to spot trouble earlier than a fixed limit would, and to point out patterns a person would take longer to notice. It tells a human. The human acts.
 
-## Knowing when the system is wrong
+## Fish are different from lizards
 
-Every alert is closed with a disposition recorded by whoever handled it, either confirmed, not confirmed or unclear, stored with the readings that produced it and the threshold version in force. One unconfirmed alert is noise. Patterns are the signal, and two patterns mean different things.
+In a land enclosure, an alert is about one animal, and a keeper can go and look at that animal.
 
-| Pattern in unconfirmed alerts | Likely cause |
+In the lagoon we cannot do that. Picking one fish out of a school and catching it is not realistic. So an alert about the lagoon says that feeding looks wrong across the group, and asks a keeper to watch the next feed.
+
+We still track individual fish, because it spots the problem sooner than looking at averages would. But what a keeper receives is information, not an instruction to go and find fish number 47.
+
+For the piranhas we are counting them and following groups over time. Recognising the same individual fish week after week may be possible later. Nothing here depends on it.
+
+## Telling when we get it wrong
+
+When a keeper deals with an alert, they close it with one of three answers: yes there was a problem, no there wasn't, or unclear. We save that answer next to the readings that caused the alert and the vet's settings at the time.
+
+One wrong alert means nothing. A pattern of wrong alerts means something, and there are two patterns worth telling apart.
+
+| What we see | What it usually means |
 |---|---|
-| The same animal, repeatedly | That individual's baseline is wrong, not the model |
-| Many animals at once | Model drift, a fouled sensor, or an unrecorded change to the environment |
+| The same animal keeps triggering false alerts | We have the wrong idea of normal for that particular animal |
+| Lots of animals start triggering false alerts | Something has changed. The model has drifted, a sensor is dirty, or the enclosures changed and nobody told us |
 
-The unconfirmed rate is monitored as a measure of the system's own health. Dispositions accumulate as the only labelled ground truth available, and cost no extra staff time because closing an alert has to happen anyway.
+We watch how often alerts turn out to be wrong. That number is how we know whether the system is still working.
 
-## Sensitivity over precision
+Those keeper answers are also the only real evidence we have of what a sick animal looks like here, and collecting them costs nothing extra, because closing an alert has to happen anyway.
 
-Missing a genuinely sick animal is worse than crying wolf, so every class is tuned to catch everything. The cost is that keepers who receive unfounded alerts stop reading them, and an ignored system misses animals just as surely. Queuing Class 3 keeps volume from becoming constant interruption, and if keepers start calling the alerts noise the fix is a better model or corrected baselines, never higher thresholds.
+## We would rather be wrong than miss something
 
-## Consequences
+Missing a genuinely sick animal is worse than a false alarm, so we set everything to catch as much as possible.
 
-**Gains**
+This has a cost. Keepers who keep getting alerts about healthy animals stop reading them, and a system nobody reads misses sick animals too. Two things help. Slow alerts go on a list instead of interrupting anyone. And we watch how often we are wrong, so we notice trust slipping before keepers give up on it.
 
-- A vet defines illness, keepers decide what to do, and software only moves information between them.
-- One sentence settles every question about what may run unsupervised.
-- Life safety survives both a failed uplink and a failed model.
-- Evaluation data generates itself from work keepers already do.
-- A wrong individual baseline and a drifting model are told apart rather than averaged together.
+If keepers start calling the alerts noise, the answer is a better model or a corrected idea of normal for that animal. Making the system quieter by raising the limits would just hide the misses.
 
-**Costs**
+## What we chose, and what it cost us
 
-- Cases only a model would catch wait on a human seeing the alert, so response is slower.
-- Threshold configuration across 55 enclosures and many species is ongoing work nobody has costed.
-- Dispositions closed carelessly degrade the ground truth invisibly.
-- Tuning for sensitivity sends keepers to healthy animals repeatedly, which erodes trust in the alerts.
-- Individual intervention in the lagoon stays physically out of reach.
+| We chose | Instead of | What it costs us |
+|---|---|---|
+| A vet sets every limit | Letting the system learn on its own what normal looks like | Someone has to write and maintain settings for 55 enclosures, and there is no vet on staff by default |
+| Only fixed rules can switch equipment on | Letting the AI act by itself when it is confident | The AI may spot a problem hours early and still wait for a person to read the alert |
+| Alerts about the lagoon cover the whole group | Alerts about one named fish | We can say feeding looks wrong, but not which fish to catch |
+| Alert whenever there is any doubt | Only alerting when the system is sure | Keepers will walk to healthy animals, and if it happens too often they stop trusting alerts |
+
+## What this gives us
+
+- The vet decides what illness is, keepers decide what to do, and the software only carries messages between them.
+- One sentence answers every question about what runs on its own.
+- If the internet goes down, or the AI fails, the safety alarms still work.
+- We find out whether the AI is any good from work keepers already do.
+- We can tell the difference between one odd animal and a system going wrong.
 
 ## Assumptions
 
-- A veterinarian supplies thresholds and standing procedures per species and reviews them periodically.
-- Where there is no in-house vet, a designated head keeper is first responder under those procedures.
+- A vet supplies the limits and the procedures for each species, and reviews them from time to time.
+- Where there is no vet on site, a senior keeper responds first, following those procedures.
 - Security are on the estate during opening hours and reachable outside them.
 
 ## Related
 
-- **ADR-040** established the tiered topology that lets Class 1 and 2 run without the uplink
-- **ADR-042** defines the telemetry and delivery guarantees this consumes
-- **ADR-044** covers behaviour when a gateway or the uplink is unavailable
-- Diagram: `docs/diagrams/C-welfare-loop.drawio`
+- **ADR-040** set up the network that lets the safety alarms work without the internet
+- **ADR-042** defines the readings this uses
+- **ADR-044** covers what happens when the connection drops
+- Diagram: 
