@@ -1,15 +1,13 @@
 # Roles and working agreement
 
-Team of four. Kelly is A, lead and integrator.
-
-A working document for the team, not a submission artefact — but it lives in the repo so
+Team of four. A working document for the team, not a submission artefact — but it lives in the repo so
 everyone is reading the same version.
 
 ## The four seats
 
 | | Seat | Owns | ADR range |
 | --- | --- | --- | --- |
-| **A** | Lead and integrator (Kelly) | The characteristics ranking, the comprehensive view, everything judges read first, admissions and ticketing | 010–019 |
+| **A** | Lead and integrator | The characteristics ranking, the comprehensive view, everything judges read first, admissions and ticketing | 010–019 |
 | **B** | AI platform and assurance | Model gateway, evaluation, cost control, authority boundaries | 020–039 |
 | **C** | Edge and animals | Connectivity, welfare, the physical estate | 040–059 |
 | **D** | Visitors, rides and money | Rides, pricing, concierge, copilot, retention | 060–079 |
