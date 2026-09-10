@@ -1,27 +1,71 @@
 # Contributing
 
-Simple rules so four people can work in parallel without stepping on each other.
+Simple rules so four people can work in parallel without stepping on each other. Seats
+and ownership are in [docs/roles.md](docs/roles.md).
 
-## Branches and pull requests
+## Branches
 
 - `main` is always the submittable version. Do not commit directly to it.
-- Create a branch per piece of work: `adr/model-provider-abstraction`, `diagram/animal-monitoring`, `docs/overview`.
-- Open a pull request; one other teammate reviews and merges. Small PRs, merged often.
+- One branch per ADR, named for its number: `adr/061-pricing`, matching the branches
+  already in flight.
+- Diagrams and docs: `diagram/ride-condition`, `docs/overview`.
+
+## Getting your work in
+
+Open a pull request if you want a second pair of eyes. If you do not, tell A and they
+will merge it.
+
+We are not requiring peer review before merge. With four people and one week, waiting
+for a reviewer costs more than it catches, and A reads everything anyway. Reviewing
+after the fact is fine and normal here — say so in the pull request or in chat.
 
 ## Writing ADRs
 
-- Copy `docs/adrs/000-template.md` to `docs/adrs/NNN-short-title.md` (next number in sequence).
-- Keep each ADR to 1–2 pages: Title, Status, Context, Decision, Consequences (trade-offs).
-- List the ADR in `docs/adrs/README.md`.
+- Take the next free number **in your seat's range**. Ranges are listed in
+  [docs/adrs/README.md](docs/adrs/README.md). Do not take the next number in overall
+  sequence — someone else has that range.
+- Copy `docs/adrs/000-template.md`, or copy a written ADR you like the shape of. 040 and
+  042 are the house style; 043 is looser and also fine. Substance matters more than
+  format.
+- Cite requirement identifiers inline from [docs/requirements.md](docs/requirements.md),
+  like `patchy wifi (C1)`. This is the cheapest way to keep four documents consistent.
+- Add your file. Leave the index row in `docs/adrs/README.md` to A — that file conflicts
+  if several of us edit it.
+
+Some ADRs already exist with a Context section written and the Decision left blank.
+Those are yours to finish, and you may rewrite the Context if you disagree with the
+framing. They exist so starting is cheap, not to settle anything.
+
+## What makes an ADR done
+
+- At least two rejected alternatives, and why each lost. Judges score trade-off analysis
+  explicitly, and an ADR that only states a decision scores nothing on it.
+- Numbers where numbers exist — thresholds, volumes, costs, limits.
+- Status moves from Proposed to Accepted at the cold read on Monday 14 September.
 
 ## Diagrams
 
-- Keep diagrams simple: boxes, arrows, words. If shapes mean different things, include a key.
-- Put the source (Mermaid `.mmd`, draw.io `.drawio`, etc.) next to the exported `.png`/`.svg` so anyone can edit it.
-- Reference every diagram from `docs/overview.md` or an ADR; the judges only see what the README links to.
+- Diagrams are Mermaid inside Markdown, in `docs/diagrams/`. GitHub renders them, so the
+  source and the picture are the same file and cannot drift apart. No exported `.png` to
+  keep in sync.
+- Use the shared key in [docs/diagrams/README.md](docs/diagrams/README.md). Paste the
+  `classDef` lines verbatim. If you need a shape or colour that is not in the key, add it
+  to the key first.
+- Keep them simple: boxes, arrows, words. Fewer than about 25 nodes.
+- Reference every diagram from an ADR or `docs/overview.md`. Judges only see what is
+  linked.
 
-## Before the Sept 16 deadline
+## Dates
+
+| When | What |
+|---|---|
+| Friday 11 September | A drafts the container view, incomplete on purpose |
+| Monday 14 September | Cold read, and the team deadline. Everything merged |
+| Tuesday 15 September | A integrates — overview, README, consistency |
+| Wednesday 16 September | Submit in the morning. The rest of the day is contingency |
+
+## Before we submit
 
 - `README.md` links to every deliverable and nothing is orphaned.
-- All diagrams have keys and are referenced.
-- Every ADR has a Status of `Accepted`.
+- Every diagram has a key and is referenced from somewhere.
+- Every ADR is Accepted, or explicitly marked as a decision we did not reach.
